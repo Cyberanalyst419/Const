@@ -11,12 +11,27 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body class="admin-body">
+  <div class="admin-bg-orb admin-bg-orb-one"></div>
+  <div class="admin-bg-orb admin-bg-orb-two"></div>
   <div class="admin-shell">
     <aside class="admin-sidebar">
-      <div>
-        <p class="admin-kicker">GoldenLand</p>
-        <h1>Admin Portal</h1>
-        <p class="admin-sidebar-copy">Manage content, analytics, media uploads, submissions, and Brevo replies from one place.</p>
+      <div class="admin-sidebar-top">
+        <div class="admin-brand-block">
+          <p class="admin-kicker">GoldenLand</p>
+          <h1>Admin Portal</h1>
+          <p class="admin-sidebar-copy">Manage content, analytics, media uploads, submissions, and Brevo replies from one place.</p>
+        </div>
+        <div class="admin-sidebar-card">
+          <p class="admin-sidebar-card-label">Workspace</p>
+          <strong>Live content operations</strong>
+          <p>Update hero copy, projects, media, forms, and replies without touching the frontend files again.</p>
+        </div>
+        <div class="admin-sidebar-links">
+          <span>Content</span>
+          <span>Analytics</span>
+          <span>Inbox</span>
+          <span>Media</span>
+        </div>
       </div>
       <div class="admin-sidebar-actions">
         <a href="/" class="btn-outline admin-nav-btn">View Site</a>
@@ -25,10 +40,19 @@
     </aside>
 
     <main class="admin-main">
+      <header class="admin-topbar">
+        <div>
+          <p class="admin-kicker">Control Center</p>
+          <h2 class="admin-topbar-title">Website operations dashboard</h2>
+          <p class="admin-topbar-copy">Keep the public site on-brand while managing analytics, uploads, and incoming leads from one responsive admin area.</p>
+        </div>
+      </header>
+
       <section id="loginView" class="admin-panel admin-login-view">
         <div class="admin-login-card">
+          <p class="admin-kicker">Secure Access</p>
           <h2>Admin Sign In</h2>
-          <p>Use the credentials from your environment file.</p>
+          <p>Use the credentials from your environment file to unlock content editing, message replies, and media management.</p>
           <form id="loginForm" class="admin-form-grid">
             <label>
               <span>Email</span>
@@ -44,26 +68,55 @@
       </section>
 
       <section id="dashboardView" class="admin-dashboard hidden">
-        <div class="admin-panel">
-          <div class="admin-panel-head">
+        <div class="admin-panel admin-panel-hero">
+          <div class="admin-panel-head admin-panel-head-hero">
             <div>
-              <p class="admin-kicker">Overview</p>
-              <h2>Dashboard Summary</h2>
+              <p class="admin-kicker">Operations</p>
+              <h2>Everything important in one place</h2>
+              <p class="admin-section-copy">Refresh metrics, update content, upload media, and reply to submissions without leaving this dashboard.</p>
             </div>
             <button id="refreshDashboardButton" class="btn-outline" type="button">Refresh</button>
           </div>
-          <div class="admin-stats" id="dashboardStats"></div>
-          <div class="admin-chart-box">
-            <h3>Click Breakdown</h3>
-            <div id="clickBreakdown"></div>
+        </div>
+
+        <div class="admin-layout-grid">
+          <div class="admin-panel admin-panel-overview">
+            <div class="admin-panel-head">
+              <div>
+                <p class="admin-kicker">Overview</p>
+                <h2>Dashboard Summary</h2>
+              </div>
+            </div>
+            <div class="admin-stats" id="dashboardStats"></div>
+            <div class="admin-chart-box">
+              <h3>Click Breakdown</h3>
+              <div id="clickBreakdown" class="admin-breakdown-list"></div>
+            </div>
+          </div>
+
+          <div class="admin-panel admin-panel-media">
+            <div class="admin-panel-head">
+              <div>
+                <p class="admin-kicker">Media</p>
+                <h2>Upload Images and Videos</h2>
+                <p class="admin-section-copy">Anything uploaded here can be pasted directly into your content JSON fields and reused across the site.</p>
+              </div>
+            </div>
+            <form id="mediaForm" class="admin-media-form">
+              <label><span>Asset Title</span><input name="title"></label>
+              <label class="admin-file-input"><span>Choose File</span><input name="file" type="file" required></label>
+              <button type="submit" class="btn-primary">Upload to Supabase</button>
+            </form>
+            <div id="mediaList" class="admin-media-list"></div>
           </div>
         </div>
 
-        <div class="admin-panel">
+        <div class="admin-panel admin-panel-content">
           <div class="admin-panel-head">
             <div>
-              <p class="admin-kicker">Content</p>
+              <p class="admin-kicker">Overview</p>
               <h2>Site Settings</h2>
+              <p class="admin-section-copy">Core brand details, hero content, links, and JSON-managed collections all live here.</p>
             </div>
             <button id="saveContentButton" class="btn-primary" type="button">Save All Content</button>
           </div>
@@ -99,26 +152,12 @@
           </form>
         </div>
 
-        <div class="admin-panel">
-          <div class="admin-panel-head">
-            <div>
-              <p class="admin-kicker">Media</p>
-              <h2>Upload Images and Videos</h2>
-            </div>
-          </div>
-          <form id="mediaForm" class="admin-media-form">
-            <label><span>Asset Title</span><input name="title"></label>
-            <label class="admin-file-input"><span>Choose File</span><input name="file" type="file" required></label>
-            <button type="submit" class="btn-primary">Upload to Supabase</button>
-          </form>
-          <div id="mediaList" class="admin-media-list"></div>
-        </div>
-
-        <div class="admin-panel">
+        <div class="admin-panel admin-panel-inbox">
           <div class="admin-panel-head">
             <div>
               <p class="admin-kicker">Inbox</p>
               <h2>Contact Submissions</h2>
+              <p class="admin-section-copy">Reply to leads, mark work complete, and keep your enquiry flow tidy from one screen.</p>
             </div>
           </div>
           <div id="submissionsList" class="admin-submissions-list"></div>

@@ -89,8 +89,8 @@ function renderDashboard(dashboard) {
 
   const breakdown = document.getElementById("clickBreakdown");
   breakdown.innerHTML = Object.keys(dashboard.clicksByType || {}).length
-    ? Object.entries(dashboard.clicksByType).map(([key, value]) => `<p><strong>${key}</strong>: ${value}</p>`).join("")
-    : "<p>No click data yet.</p>";
+    ? Object.entries(dashboard.clicksByType).map(([key, value]) => `<p><strong>${key}</strong>${value}</p>`).join("")
+    : '<div class="admin-empty-state">No click data yet.</div>';
 }
 
 function renderMedia(items) {
@@ -106,7 +106,7 @@ function renderMedia(items) {
         <button type="button" data-copy-url="${item.public_url}">Copy URL</button>
       </div>
     </article>
-  `).join("") : "<p>No media uploaded yet.</p>";
+  `).join("") : '<div class="admin-empty-state">No media uploaded yet.</div>';
 
   list.querySelectorAll("[data-copy-url]").forEach((button) => {
     button.addEventListener("click", async () => {
@@ -138,7 +138,7 @@ function renderSubmissions(submissions, replies) {
         <p><strong>Service:</strong> ${submission.service}</p>
         <p>${submission.message}</p>
         <div class="admin-reply-history">
-          ${replyList.length ? replyList.map((reply) => `<p><strong>${reply.subject}</strong><br>${reply.message}</p>`).join("") : "<p>No reply sent yet.</p>"}
+          ${replyList.length ? replyList.map((reply) => `<p><strong>${reply.subject}</strong><br>${reply.message}</p>`).join("") : '<div class="admin-empty-state">No reply sent yet.</div>'}
         </div>
         <form class="replyForm" data-submission-id="${submission.id}">
           <input name="subject" placeholder="Reply subject" required>
@@ -150,7 +150,7 @@ function renderSubmissions(submissions, replies) {
         </form>
       </article>
     `;
-  }).join("") : "<p>No submissions yet.</p>";
+  }).join("") : '<div class="admin-empty-state">No submissions yet.</div>';
 
   list.querySelectorAll(".replyForm").forEach((form) => {
     form.addEventListener("submit", handleReplySubmit);
