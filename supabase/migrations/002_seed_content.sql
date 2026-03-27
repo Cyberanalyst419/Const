@@ -8,9 +8,9 @@ values
       "gps": "GE-134-3488",
       "location": "Ashongman Estates, Accra",
       "email": "goldenlandconstructionltd@gmail.com",
-      "phone": "+233 (0) 30 123 4567",
-      "phoneRaw": "+233301234567",
-      "whatsapp": "233301234567",
+      "phone": "+233 24 347 5142",
+      "phoneRaw": "+233243475142",
+      "whatsapp": "233243475142",
       "mapEmbedUrl": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3970.4035!2d-0.1872!3d5.6245!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNcKwMzcnMjguMiJOIDDCsDExJzE0LjAiVw!5e0!3m2!1sen!2sgh!4v1620000000000!5m2!1sen!2sgh"
     }'::jsonb
   ),
@@ -37,7 +37,7 @@ values
       "facebook": "#",
       "linkedin": "#",
       "instagram": "#",
-      "whatsapp": "233301234567"
+      "whatsapp": "233243475142"
     }'::jsonb
   )
 on conflict (key) do update set value = excluded.value, updated_at = timezone('utc', now());
