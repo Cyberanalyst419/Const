@@ -7,6 +7,7 @@ const session = require("express-session");
 const helmet = require("helmet");
 const multer = require("multer");
 const bcrypt = require("bcryptjs");
+const fetch = require("node-fetch");
 const { createClient } = require("@supabase/supabase-js");
 const defaults = require("./lib/default-content");
 
@@ -28,6 +29,7 @@ const analyticsSalt = process.env.ANALYTICS_SALT || "goldenland-analytics-salt";
 const brevoApiKey = process.env.BREVO_API_KEY || "";
 const brevoSenderEmail = process.env.BREVO_SENDER_EMAIL || "";
 const brevoSenderName = process.env.BREVO_SENDER_NAME || "GoldenLand Construction";
+const adminNotificationEmail = process.env.ADMIN_NOTIFICATION_EMAIL || "";
 const mediaBucket = process.env.SUPABASE_MEDIA_BUCKET || "site-media";
 
 app.use(helmet({
@@ -202,42 +204,50 @@ function hashIp(req) {
 
 async function sendBrevoEmail({ to, subject, htmlContent, textContent }) {
   if (!brevoApiKey || !brevoSenderEmail) {
-    return { skipped: true };
+    return { skipped: true, error: "Email configuration (API Key or Sender) is missing." };
   }
 
-  const response = await fetch("https://api.brevo.com/v3/smtp/email", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "api-key": brevoApiKey
-    },
-    body: JSON.stringify({
-      sender: {
-        email: brevoSenderEmail,
-        name: brevoSenderName
+  try {
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "api-key": brevoApiKey
       },
-      to: [{ email: to }],
-      subject,
-      htmlContent,
-      textContent
-    })
-  });
+      body: JSON.stringify({
+        sender: {
+          email: brevoSenderEmail,
+          name: brevoSenderName
+        },
+        to: [{ email: to }],
+        subject,
+        htmlContent: htmlContent || textContent,
+        textContent: textContent || htmlContent
+      })
+    });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Brevo request failed: ${response.status} ${errorText}`);
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || `Brevo API returned status ${response.status}`);
+    }
+
+    return { success: true, messageId: data.messageId };
+  } catch (error) {
+    console.error("Email delivery failed:", error.message);
+    throw error;
   }
-
-  return response.json();
 }
 
 async function sendAdminNotification(submission) {
-  if (!brevoApiKey || !brevoSenderEmail || !process.env.ADMIN_NOTIFICATION_EMAIL) {
+  if (!brevoApiKey || !brevoSenderEmail || !adminNotificationEmail) {
+    console.warn("Skipping admin notification email: Configuration incomplete.");
     return;
   }
 
   await sendBrevoEmail({
-    to: process.env.ADMIN_NOTIFICATION_EMAIL,
+    to: adminNotificationEmail,
     subject: `New website inquiry from ${submission.name}`,
     textContent: `Service: ${submission.service}\nEmail: ${submission.email}\nPhone: ${submission.phone || "N/A"}\n\n${submission.message}`,
     htmlContent: `
@@ -567,12 +577,16 @@ app.post("/api/admin/submissions/:id/reply", requireSupabase, requireAdmin, asyn
       htmlContent: `<p>${message.replace(/\n/g, "<br>")}</p>`
     });
 
+    if (brevoResult.skipped) {
+      return res.status(500).json({ error: "Email service not configured on server." });
+    }
+
     const replyResult = await supabase.from("submission_replies").insert({
       submission_id: submissionId,
       admin_email: req.session.adminEmail,
       subject,
       message,
-      brevo_message_id: brevoResult?.messageId || null
+      brevo_message_id: brevoResult.messageId || null
     });
 
     if (replyResult.error) {
@@ -615,4 +629,7 @@ app.patch("/api/admin/submissions/:id/status", requireSupabase, requireAdmin, as
 
 app.listen(port, () => {
   console.log(`GoldenLand server listening on http://localhost:${port}`);
+  if (!supabase) console.warn("Warning: Supabase client not initialized.");
+  if (!brevoApiKey) console.warn("Warning: BREVO_API_KEY is not set.");
+  if (!adminNotificationEmail) console.warn("Warning: ADMIN_NOTIFICATION_EMAIL is not set.");
 });
